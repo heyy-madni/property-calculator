@@ -10,6 +10,7 @@
 #!imports
 
 from common_utils import loading_bar, clear_console , create_log_of_this_session ,print_creator_info
+from terminal_colors import RED, GREEN, YELLOW, WHITE, CYAN, PINK, LIGHT_CYAN, LIGHT_YELLOW, LIGHT_GREEN, RESET, BOLD
 from analysis_engine import calculate_score, get_Insight, classify_deal 
 from user_input import  get_data
 from terminal_report_generator import show_terminal_report
@@ -46,13 +47,16 @@ def main():
     #! agreement handling
     
 
-    if not check_agreement():
-        print("You have not accepted the User Agreement.")
+    if check_agreement():
+        print(f"{LIGHT_GREEN}\nYou have already accepted the agreement.{RESET}")
+    else:
+        print(f"{LIGHT_YELLOW}\nYou have not accepted the User Agreement.{RESET}")
         accepted = agreement()
+
         if accepted:
             save_agreement()
         else:
-            print("You did not accept the agreement. Exiting.")
+            print(f"{RED}\nYou did not accept the agreement. Exiting.{RESET}")
             return
 
 

@@ -11,13 +11,11 @@ from terminal_colors import (
 
 
 def check_agreement():
-
     if not os.path.exists(AGREEMENT_FILE):
         return False
 
     with open(AGREEMENT_FILE, "r") as file:
         return file.read().strip() == "True"
-    print("You have already accepted the agreement.")
 
 
 def save_agreement():
