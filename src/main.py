@@ -111,16 +111,17 @@ def main():
         
         #! calculations
         
+        effective_rent = rent * (1 - vacancy_rate)
 
-        cashflow = calculate_cashflow(rent, emi)
+        cashflow = calculate_cashflow(effective_rent, emi, maintenance_annual)
 
         annual_cashflow = calculate_annual_cashflow(cashflow)
 
-        rental_yield = calculate_rental_yield(rent, price)
+        rental_yield = calculate_rental_yield(effective_rent, price)
 
         ltv = calculate_ltv(loan_amount, price)
 
-        vacancy_loss = rent * 12 * vacancy_rate
+        vacancy_loss = effective_rent * 12 * vacancy_rate
 
 
 
@@ -128,11 +129,11 @@ def main():
 
         real_roi = (net_annual_cashflow / cash_invested * 100) if cash_invested > 0 else 0
 
-        rent_to_emi_coverage = (rent / emi * 100) if emi > 0 else 0
+        rent_to_emi_coverage = (effective_rent / emi * 100) if emi > 0 else 0
 
         future_value = calculate_future_value(price, appreciation)
 
-        future_rent = calculate_future_rent(rent, rent_growth)
+        future_rent = calculate_future_rent(effective_rent, rent_growth)
 
         location_score = (
             locality_quality +future_development +rental_demand +political_stability ) / 4
@@ -233,6 +234,7 @@ def main():
                     score=score,
                     deal_type=deal_type,
                     insight=giveinsight,
+                    effective_rent=effective_rent
                 
                 )
                 break

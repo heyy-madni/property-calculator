@@ -5,8 +5,10 @@
 #! calculation
 # =========================
 #^cashflow
-def calculate_cashflow(rent, emi):
-    return rent - emi
+
+
+def calculate_cashflow(effective_rent, emi, maintenance_annual):
+    return effective_rent - emi - (maintenance_annual / 12)
 
 #^annual cashflow
 def calculate_annual_cashflow(cashflow):
@@ -17,8 +19,8 @@ def calculate_roi(annual_cashflow, cash_invested):
     return (annual_cashflow / cash_invested * 100) if cash_invested > 0 else 0
 
 #^rental yield
-def calculate_rental_yield(rent, price):
-    return (rent * 12 / price * 100) if price > 0 else 0
+def calculate_rental_yield(effective_rent, price):
+    return (effective_rent * 12 / price * 100) if price > 0 else 0
 
 #^ltv
 def calculate_ltv(loan_amount, price):
@@ -29,8 +31,8 @@ def calculate_future_value(price, appreciation, years=5):
     return price * ((1 + appreciation) ** years)
 
 #^future rent
-def calculate_future_rent(rent, rent_growth, years=5):
-    return rent * ((1 + rent_growth) ** years)
+def calculate_future_rent(effective_rent, rent_growth, years=5):
+    return effective_rent * ((1 + rent_growth) ** years)
 
 
 

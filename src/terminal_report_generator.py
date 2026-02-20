@@ -83,6 +83,7 @@ def show_terminal_report(
     score,
     deal_type,
     insight,
+    effective_rent,
 ):
     print_header("PROPERTY ANALYSIS REPOT")
 
@@ -103,6 +104,7 @@ def show_terminal_report(
             ("Monthly Cashflow", f"₹{cashflow:,.0f}"),
             ("Annual Cashflow", f"₹{annual_cashflow:,.0f}"),
             ("Net Annual (After Tax)", f"₹{net_annual_cashflow:,.0f}"),
+            ("Effective Rent", f"₹{effective_rent:,.0f}"),
             ("Real ROI", f"{real_roi:.2f}%"),
             ("Rental Yield", f"{rental_yield:.2f}%"),
             ("Loan-to-Value (LTV)", f"{ltv:.1f}%"),

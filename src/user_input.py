@@ -46,8 +46,9 @@ def get_data():
 
 
     rent = get_float(PINK + "Enter monthly rent (₹): " + RESET)
-    if rent <0:
-        print(RED + " I think you're losing I think this is not a Rental Property." + RESET)
+    if rent <=0:
+        print(RED + "Rent must be greater than zero. Please re-enter the data." + RESET)
+        return get_data()
 
 
 
@@ -84,6 +85,10 @@ def get_data():
     rent_growth = get_float(PINK + "Expected annual rent growth (e.g., 0.03 for 3%): " + RESET)
 
     vacancy_rate = get_float(PINK + "Expected vacancy rate (e.g., 0.08 for 8%): " + RESET)
+    if vacancy_rate <0 or vacancy_rate >=100:
+        print(RED + "Vacancy rate must be between 0 and 100. Please re-enter the data." + RESET)
+        return get_data()
+    
     maintenance_annual = get_float(PINK + "Annual maintenance cost (₹): " + RESET)
 
 
