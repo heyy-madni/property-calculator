@@ -141,11 +141,12 @@ def main():
         maintenance_annual = data_source["maintenance_annual"]
 
         effective_rent = rent * (1 - vacancy_rate)
+        vacancy_loss = rent * 12 * vacancy_rate
         cashflow = calculate_cashflow(effective_rent, emi, maintenance_annual)
         annual_cashflow = calculate_annual_cashflow(cashflow)
         rental_yield = calculate_rental_yield(effective_rent, price)
         ltv = calculate_ltv(loan_amount, price)
-        vacancy_loss = rent * 12 * vacancy_rate
+
 
         net_annual_cashflow = annual_cashflow - maintenance_annual - vacancy_loss
         real_roi = (net_annual_cashflow / cash_invested * 100) if cash_invested > 0 else 0
