@@ -8,7 +8,7 @@
 
 
 #!imports
-
+from random import randrange
 from common_utils import loading_bar, clear_console , create_log_of_this_session ,print_creator_info
 from terminal_colors import RED, GREEN, YELLOW, WHITE, CYAN, PINK, LIGHT_CYAN, LIGHT_YELLOW, LIGHT_GREEN, RESET, BOLD
 from analysis_engine import calculate_score, get_Insight, classify_deal 
@@ -26,8 +26,34 @@ from financial_calculations import (
     calculate_future_rent,
     risk_check
     )
-
-
+test_data = {
+    "price": 5000000,
+    "loan_amount": 3000000,
+    "rent": 25000,
+    "emi": 15000,
+    "locality_quality": 8,
+    "future_development": 7,
+    "rental_demand": 8,
+    "political_stability": 9,
+    "cash_invested": 2000000,
+    "appreciation": 0.05,
+    "rent_growth": 0.03,
+    "vacancy_rate": 0.1,
+    "maintenance_annual": 12000
+}
+random_used_data = {"price": randrange(1000000, 10000000, 500000),
+                    "loan_amount": randrange(500000, 7000000, 500000),
+                    "rent": randrange(5000, 50000, 5000),  
+                    "emi": randrange(5000, 40000, 5000),
+                    "locality_quality": randrange(1, 11),
+                    "future_development": randrange(1, 11),
+                    "rental_demand": randrange(1, 11),
+                    "political_stability": randrange(1, 11),
+                    "cash_invested": randrange(500000, 7000000, 500000),
+                    "appreciation": randrange(1, 11) / 100,
+                    "rent_growth": randrange(1, 11) / 100,
+                    "vacancy_rate": randrange(0, 11) / 100,
+                    "maintenance_annual": randrange(5000, 20000, 1000)}
 
 
 #! Main Program
@@ -66,27 +92,45 @@ def main():
     
 
     while True:
-        print("\n🏠 --- Property Investment Calculator ---\n")
-        print("1. New Calculation")
-        print("2. View Previous Reports")
-        print("3. Exit")
+        try:
+            print("\n🏠 --- Property Investment Calculator ---\n")
+            print("1. New Calculation")
+            print("2. View Previous Reports")
+            print("3. use inbuilt test data")
+            print("4. use random used data")
+            print("5. Exit")
 
-        menu_choice = input("Choose option: ").strip()
-        clear_console()
-
-
-        if menu_choice == "2":
-            view_previous_pdfs()
+            menu_choice = input("Choose option: ").strip()
             clear_console()
-            continue
 
-        if menu_choice == "3":
-            print("Exiting program. Goodbye!")
-            return
 
-        if menu_choice != "1":
-            print("Invalid choice.")
-            continue
+            if menu_choice == "5":
+                print("Exiting program. Goodbye!")
+                return
+
+            elif menu_choice == "2":
+                view_previous_pdfs()
+
+            elif menu_choice == "3":
+                #! use inbuilt test data
+                pass
+            elif menu_choice == "4":
+                #! use random used data
+                pass
+
+            elif menu_choice != "1":
+                print("Invalid choice.")
+                return
+
+            elif menu_choice == "1":
+                    #! Main Calculation
+                   continue
+
+        except Exception as e:
+            print(f"{RED}An error occurred: {e}{RESET}")
+
+
+
 
         
         #! Get Inputs

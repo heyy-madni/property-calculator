@@ -1,7 +1,7 @@
 #import
 from paths import PDF_DIR
 from os import startfile
-
+from common_utils import clear_console
 
 
 def view_previous_pdfs():
@@ -23,6 +23,7 @@ def view_previous_pdfs():
     choice = input("\nEnter report number to open (or press Enter to cancel): ").strip()
 
     if choice == "":
+        clear_console()
         return
 
     if not choice.isdigit():

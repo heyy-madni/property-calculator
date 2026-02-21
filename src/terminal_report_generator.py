@@ -85,7 +85,7 @@ def show_terminal_report(
     insight,
     effective_rent,
 ):
-    print_header("PROPERTY ANALYSIS REPOT")
+    print_header("PROPERTY ANALYSIS REPORT")
 
     #& Decision Block
     d_color = decision_color(decision)
