@@ -1,4 +1,0 @@
-1 fixed UX problems
-2 made more readable
-3 clean modules (mean there were many function it was unrelated to its module)
-4 add utilities
