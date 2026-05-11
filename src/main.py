@@ -7,7 +7,7 @@
 
 
 
-#!imports
+#! imports
 from random import randrange
 from common_utils import loading_bar, clear_console , create_log_of_this_session ,print_creator_info
 from terminal_colors import RED, GREEN, YELLOW, WHITE, CYAN, PINK, LIGHT_CYAN, LIGHT_YELLOW, LIGHT_GREEN, RESET, BOLD

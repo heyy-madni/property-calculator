@@ -1,13 +1,6 @@
 # walk.py
 from pathlib import Path
-import sys
-
-if getattr(sys, 'frozen', False):
-    # Running inside PyInstaller EXE
-    BASE_DIR = Path(sys._MEIPASS)
-else:
-    # Running as normal Python script
-    BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 SCR_DIR = BASE_DIR / "src"
 DATA_DIR = BASE_DIR / "data"
