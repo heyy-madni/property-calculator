@@ -2,12 +2,7 @@
 import os
 from common_utils import clear_console,type_text
 from paths import AGREEMENT_FILE
-from terminal_colors import (
-    RED,
-    BOLD,
-    LIGHT_YELLOW,
-    RESET
-)
+import terminal_colors as colors 
 
 
 def check_agreement():
@@ -74,8 +69,8 @@ def agreement_text():
 def agreement():
     while True:
         type_text(agreement_text())
-        choice = input(f"{LIGHT_YELLOW}{BOLD}\nType 'agree' to accept and continue: {RESET}").strip().lower()
+        choice = input(f"{colors.LIGHT_YELLOW}{colors.BOLD}\nType 'agree' to accept and continue: {colors.RESET}").strip().lower()
         if choice == "agree":
             clear_console()
             return True
-        print(f"{RED}You must type 'agree' to continue.{RESET}")
+        print(f"{colors.RED}You must type 'agree' to continue.{colors.RESET}")
