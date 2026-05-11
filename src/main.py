@@ -9,23 +9,16 @@
 
 #! imports
 from random import randrange
-from common_utils import loading_bar, clear_console , create_log_of_this_session ,print_creator_info
-from terminal_colors import RED, GREEN, YELLOW, WHITE, CYAN, PINK, LIGHT_CYAN, LIGHT_YELLOW, LIGHT_GREEN, RESET, BOLD
-from analysis_engine import calculate_score, get_Insight, classify_deal 
+import common_utils as utils
+import terminal_colors as colors
+import analysis_engine as analysis
 from user_input import  get_data
 from terminal_report_generator import show_terminal_report
-from agreement_manager import agreement, show_greeting,check_agreement,save_agreement
+import agreement_manager  as agreement_mod
 from pdf_report_library import view_previous_pdfs
 from pdf_report_generator import generate_property_report
-from financial_calculations import (
-    calculate_cashflow,
-    calculate_annual_cashflow,
-    calculate_rental_yield,
-    calculate_ltv,
-    calculate_future_value,
-    calculate_future_rent,
-    risk_check
-    )
+import financial_calculations as financials
+
 test_data = {
     "price": 5000000,
     "loan_amount": 3000000,
@@ -64,26 +57,26 @@ def generate_random_data():
 
 def main():
 
-    create_log_of_this_session()
-    clear_console()
-    print_creator_info()
-    show_greeting()
+    utils.create_log_of_this_session()
+    utils.clear_console()
+    utils.print_creator_info()
+    agreement_mod.show_greeting()
 
     #! Agreement handling
-    if check_agreement():
-        print(f"{LIGHT_GREEN}\nYou have already accepted the agreement.{RESET}")
+    if agreement_mod.check_agreement():
+        print(f"{colors.LIGHT_GREEN}\nYou have already accepted the agreement.{colors.RESET}")
     else:
-        print(f"{LIGHT_YELLOW}\nYou have not accepted the User Agreement.{RESET}")
-        if agreement():
-            save_agreement()
+        print(f"{colors.LIGHT_YELLOW}\nYou have not accepted the User Agreement.{colors.RESET}")
+        if agreement_mod.agreement():
+            agreement_mod.save_agreement()
         else:
-            print(f"{RED}\nYou did not accept the agreement. Exiting.{RESET}")
+            print(f"{colors.RED}\nYou did not accept the agreement. Exiting.{colors.RESET}")
             return
 
     #! Main menu loop
     while True:
 
-        print("\n🏠 --- Property Investment Calculator ---\n")
+        print("\n --- Property Investment Calculator ---\n")
         print("1. New Calculation")
         print("2. View Previous Reports")
         print("3. Use Inbuilt Test Data")
@@ -91,7 +84,7 @@ def main():
         print("5. Exit")
 
         menu_choice = input("Choose option: ").strip()
-        clear_console()
+        utils.clear_console()
 
         #* Exit
         if menu_choice == "5":
@@ -142,17 +135,17 @@ def main():
 
         effective_rent = rent * (1 - vacancy_rate)
         vacancy_loss = rent * 12 * vacancy_rate
-        cashflow = calculate_cashflow(effective_rent, emi, maintenance_annual)
-        annual_cashflow = calculate_annual_cashflow(cashflow)
-        rental_yield = calculate_rental_yield(effective_rent, price)
-        ltv = calculate_ltv(loan_amount, price)
+        cashflow = financials.calculate_cashflow(effective_rent, emi, maintenance_annual)
+        annual_cashflow = financials.calculate_annual_cashflow(cashflow)
+        rental_yield = financials.calculate_rental_yield(effective_rent, price)
+        ltv = financials.calculate_ltv(loan_amount, price)
 
 
         net_annual_cashflow = annual_cashflow - maintenance_annual - vacancy_loss
         real_roi = (net_annual_cashflow / cash_invested * 100) if cash_invested > 0 else 0
         rent_to_emi_coverage = (effective_rent / emi * 100) if emi > 0 else 0
-        future_value = calculate_future_value(price, appreciation)
-        future_rent = calculate_future_rent(effective_rent, rent_growth)
+        future_value = financials.calculate_future_value(price, appreciation)
+        future_rent = financials.calculate_future_rent(effective_rent, rent_growth)
 
         location_score = (
             locality_quality +
@@ -161,7 +154,7 @@ def main():
             political_stability
         ) / 4
 
-        decision, score = calculate_score(
+        decision, score = analysis.calculate_score(
             real_roi=real_roi,
             cashflow=cashflow,
             rent_to_emi_coverage=rent_to_emi_coverage,
@@ -169,7 +162,7 @@ def main():
             location_score=location_score
         )
 
-        risk_score, risklabel, risk_reasons = risk_check(
+        risk_score, risklabel, risk_reasons = financials.risk_check(
             location_score=location_score,
             ltv=ltv,
             real_roi=real_roi,
@@ -178,7 +171,7 @@ def main():
             cashflow=cashflow
         )
 
-        deal_type = classify_deal(
+        deal_type = analysis.classify_deal(
             cashflow,
             real_roi,
             rental_yield,
@@ -186,7 +179,7 @@ def main():
             risk_score
         )
 
-        giveinsight = get_Insight(
+        giveinsight = analysis.get_Insight(
             cashflow,
             real_roi,
             rental_yield,
@@ -197,15 +190,15 @@ def main():
         )
 
         
-        #! Output selection
+        #! output selection
         
 
         while True:
             choice = input("\nGenerate PDF or Terminal report? (PDF / TER): ").strip().lower()
 
             if choice == "pdf":
-                clear_console()
-                loading_bar()
+                utils.clear_console()
+                utils.loading_bar()
                 generate_property_report(
                     price=price,
                     cashflow=cashflow,
@@ -228,8 +221,8 @@ def main():
                 break
 
             elif choice == "ter":
-                clear_console()
-                loading_bar()
+                utils.clear_console()
+                utils.loading_bar()
                 show_terminal_report(
                     price=price,
                     cashflow=cashflow,
@@ -265,7 +258,10 @@ def main():
 
 #! run program 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"{colors.RED}An error occurred: {e}{colors.RESET}")
 
 
 
