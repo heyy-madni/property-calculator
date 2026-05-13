@@ -1,8 +1,8 @@
 #import
 import sys
 import subprocess
-from paths import PDF_DIR
-from common_utils import clear_console
+from utils.paths import PDF_DIR #type: ignore
+from utils.common_utils import clear_console#type: ignore
 
 
 def open_file(path):

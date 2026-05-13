@@ -136,6 +136,7 @@ def show_terminal_report(
     print(colors.RED + "\n" + "=" * 20)
     print(colors.LIGHT_YELLOW + "End of Report" + colors.RESET)
     print(colors.RED + "=" * 20)
+    input(f"\n{colors.LIGHT_YELLOW}Press Enter to return to main menu...{colors.RESET}")
 
 
 

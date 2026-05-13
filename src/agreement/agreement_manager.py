@@ -1,13 +1,6 @@
-
 import os
-from common_utils import clear_console,type_text
-from paths import AGREEMENT_FILE
-import terminal_colors as colors 
-
-
-import os
-import common_utils as utils 
-from paths import AGREEMENT_FILE 
+import utils.common_utils as utils #type: ignore
+from utils.paths import AGREEMENT_FILE #type: ignore
  
 
 
@@ -25,8 +18,9 @@ def save_agreement():
 
 
 def show_greeting():
-    utils.type_text("Welcome to the Property Investment Calculator!")
-    utils.type_text("Please read and accept the limitation agreement to continue.")
+    print("Welcome to the Property Investment Calculator!")
+    print("Please read and accept the limitation agreement to continue.")
+    input("Press Enter to view the agreement...")
 
 
 def slowed_agreement_text():
@@ -49,8 +43,8 @@ def agreement():
     while True:
         utils.type_text(slowed_agreement_text())
         print(agreement_text())
-        choice = input(f"{colors.LIGHT_YELLOW}{utils.BOLD}\nType 'agree' to accept and continue: {colors.RESET}").strip().lower()
+        choice = input(f"{utils.LIGHT_YELLOW}{utils.BOLD}\nType 'agree' to accept and continue: {utils.RESET}").strip().lower()
         if choice == "agree":
             utils.clear_console()
             return True
-        utils.type_text(f"{colors.RED}You must type 'agree' to continue.{colors.RESET}")
+        utils.type_text(f"{utils.RED}You must type 'agree' to continue.{utils.RESET}")

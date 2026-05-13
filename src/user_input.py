@@ -1,6 +1,5 @@
 #import
 
-
 from terminal_colors import RED,  PINK, RESET
 
 #! ---------- FLOAT INPUT FUNCTION ----------
@@ -11,7 +10,6 @@ def get_float(prompt):
             return float(input(prompt))
         except ValueError:
             print("Please enter a valid number.")
-
 
 
 #! ---------- INPUT DATA FUNCTION ----------
@@ -40,7 +38,7 @@ def get_data():
             PINK + "Enter your total cash invested (₹): " + RESET)
         emi = get_float(PINK + "Enter monthly EMI (₹): " + RESET)
         if emi <0:
-         print(RED + "EMI cannot be negative, EMI can be zero. Please re-enter the data. " + RESET)
+            print(RED + "EMI cannot be negative, EMI can be zero. Please re-enter the data. " + RESET)
         return get_data()
 
 

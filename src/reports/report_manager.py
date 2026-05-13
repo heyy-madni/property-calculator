@@ -1,10 +1,139 @@
-# pdf_export.py
+# imports
+
+
+
+import utils.common_utils as utils#type:ignore
+
+
+
+
+#& Terminal Report Generator
+def decision_color(decision):
+    return utils.GREEN if decision == "buy" else utils.RED if decision == "sell" else utils.YELLOW
+
+
+def print_header(title):
+    print(utils.RED + "\n" + "=" * 60)
+    print(f"{utils.WHITE}{utils.BOLD}{title.center(60)}{utils.RESET}")
+    print(utils.RED + "=" * 60 + utils.RESET)
+
+
+def print_section(title):
+    print(f"\n{utils.PINK}{utils.BOLD}{title}{utils.RESET}")
+    print(utils.RED + "-" * 60 + utils.RESET)
+
+
+def print_table(title, headers, rows, col_width=24):
+    print(f"\n{utils.PINK}{utils.BOLD}{title}{utils.RESET}")
+    print(utils.RED + "-" * (col_width * len(headers)) + utils.RESET)
+
+    header_row = ""
+    for h in headers:
+        header_row += f"{utils.BOLD}{h:<{col_width}}{utils.RESET}"
+    print(header_row)
+
+    print(utils.RED + "-" * (col_width * len(headers)) + utils.RESET)
+
+    for row in rows:
+        row_str = ""
+        for cell in row:
+            row_str += f"{utils.CYAN}{str(cell):<{col_width}}{utils.RESET}"
+        print(row_str)
+
+    print(utils.RED + "-" * (col_width * len(headers)) + utils.RESET)
+
+
+def print_bar(label, value, max_value=10, color=utils.GREEN):
+    bars = int(min(value, max_value))
+    print(f"{label:<25}: {color}{'█' * bars}{utils.RESET} ({value})")
+
+
+
+#& Summary Report
+
+
+def show_terminal_report(results):
+    utils.clear_console()
+    print_header("PROPERTY ANALYSIS REPORT")
+
+    #& Decision Block
+    d_color = decision_color(results['decision'])
+    s_color = utils.GREEN if results['score'] >= 8 else utils.RED if results['score'] <= 3 else utils.YELLOW
+
+    print(f"\nDecision        : {d_color}{results['decision'].upper()}{utils.RESET}")
+    print(f"Investment Score: {s_color}{results['score']}/10{utils.RESET}")
+    print(f"Deal Type       : {utils.LIGHT_GREEN}{results['deal_type']}{utils.RESET}")
+
+    #& Financial Metrics Table
+    print_table(
+        "Financial Metrics",
+        ["Metric", "Value"],
+        [
+            ("Property Price", f"₹{results['price']:,.0f}"),
+            ("Monthly Cashflow", f"₹{results['cashflow']:,.0f}"),
+            ("Annual Cashflow", f"₹{results['annual_cashflow']:,.0f}"),
+            ("Net Annual (After Tax)", f"₹{results['net_annual_cashflow']:,.0f}"),
+            ("Effective Rent", f"₹{results['effective_rent']:,.0f}"),
+            ("Real ROI", f"{results['real_roi']:.2f}%"),
+            ("Rental Yield", f"{results['rental_yield']:.2f}%"),
+            ("Loan-to-Value (LTV)", f"{results['ltv']:.1f}%"),
+        ]
+    )
+
+    print_bar("ROI Strength", results['real_roi'])
+
+    #& 5-Year Projections
+    print_table(
+        "5-Year Projections",
+        ["Projection", "Estimated Value"],
+        [
+            ("Property Value", f"₹{results['future_value']:,.0f}"),
+            ("Monthly Rent", f"₹{results['future_rent']:,.0f}")
+        ]
+    )
+
+    #& Location & Risk Overview
+    print_table(
+        "Location & Risk Overview",
+        ["Factor", "Score", "Comment"],
+        [
+            ("Location", f"{results['location_score']}/10", "Demand & connectivity"),
+            ("Risk", f"{results['risk_score']}/10", results['risk_label']),
+        ]
+    )
+
+    print_bar("Location Strength", results['location_score'])
+    print_bar("Risk Exposure", results['risk_score'], color=utils.YELLOW)
+
+
+
+    #& Risk Factors
+    print_section("Major Risk Factors")
+    for r in results['risk_reasons']:
+        print(f"{utils.LIGHT_CYAN}- {r}{utils.RESET}")
+
+    #& Insights
+    print_section("Key Insights")
+    for line in results['insight']:
+        print(f"{utils.LIGHT_CYAN}- {line}{utils.RESET}")
+
+
+
+    print(utils.RED + "\n" + "=" * 20)
+    print(utils.LIGHT_YELLOW + "End of Report" + utils.RESET)
+    print(utils.RED + "=" * 20)
+    input(f"\n{utils.LIGHT_YELLOW}Press Enter to return to main menu...{utils.RESET}")
+
+
+
+#!  PDF Report Generator
+
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.lib.utils import simpleSplit
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from paths import FONTS_DIR, PDF_DIR
+from utils.paths import FONTS_DIR, PDF_DIR #type: ignore
 from datetime import datetime
 
 
@@ -272,7 +401,7 @@ def draw_header(pdf, decision, score, deal_type):
     return badge_y - 48    # y ready for first section
 
 
-# ── TWO-COLUMN MINI STATS (for location/risk)
+#* 2-COLUMN MINI STATS (for location/risk)
 
 def two_col_stat(pdf, left_label, left_val, right_label, right_val,
                  lv_color, rv_color, y):
@@ -316,13 +445,7 @@ def draw_footer(pdf, y):
 
 #* main
 
-def generate_property_report(
-    price, cashflow, annual_cashflow, net_annual_cashflow,
-    real_roi, rental_yield, ltv,
-    future_value, future_rent,
-    location_score, risk_score, risk_label,
-    reasons, decision, score, deal_type, insights
-):
+def generate_property_report(results):
 
     PDF_DIR.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -335,7 +458,7 @@ def generate_property_report(
     _draw_page_bg(pdf)
 
     # header band + decision badges
-    y = draw_header(pdf, decision, score, deal_type)
+    y = draw_header(pdf, results['decision'], results['score'], results['deal_type'])
     y -= 10
 
 
@@ -345,13 +468,13 @@ def generate_property_report(
     card_top = y
     y = open_card(pdf, y)
     metrics = [
-        ("Property Price",         f"₹{price:,.0f}"),
-        ("Monthly Cashflow",       f"₹{cashflow:,.0f}"),
-        ("Annual Cashflow",        f"₹{annual_cashflow:,.0f}"),
-        ("Net Annual (After Tax)", f"₹{net_annual_cashflow:,.0f}"),
-        ("Real ROI",               f"{real_roi:.2f}%"),
-        ("Rental Yield",           f"{rental_yield:.2f}%"),
-        ("Loan-to-Value (LTV)",    f"{ltv:.1f}%"),
+        ("Property Price",         f"₹{results['price']:,.0f}"),
+        ("Monthly Cashflow",       f"₹{results['cashflow']:,.0f}"),
+        ("Annual Cashflow",        f"₹{results['annual_cashflow']:,.0f}"),
+        ("Net Annual (After Tax)", f"₹{results['net_annual_cashflow']:,.0f}"),
+        ("Real ROI",               f"{results['real_roi']:.2f}%"),
+        ("Rental Yield",           f"{results['rental_yield']:.2f}%"),
+        ("Loan-to-Value (LTV)",    f"{results['ltv']:.1f}%"),
     ]
     for label, value in metrics:
         y = metric_row(pdf, label, value, y, C["section_fin"])
@@ -365,8 +488,8 @@ def generate_property_report(
     card_top = y
     y = open_card(pdf, y)
     projections = [
-        ("Estimated Property Value", f"₹{future_value:,.0f}"),
-        ("Estimated Monthly Rent",   f"₹{future_rent:,.0f}"),
+        ("Estimated Property Value", f"₹{results['future_value']:,.0f}"),
+        ("Estimated Monthly Rent",   f"₹{results['future_rent']:,.0f}"),
     ]
     for label, value in projections:
         y = metric_row(pdf, label, value, y, C["section_prj"])
@@ -378,8 +501,8 @@ def generate_property_report(
     y = section_header(pdf, "Location & Risk Overview", C["section_loc"], y)
     y = two_col_stat(
         pdf,
-        "Location Score",  f"{location_score}/10",
-        "Risk Exposure",   f"{risk_score}/10",
+        "Location Score",  f"{results['location_score']}/10",
+        "Risk Exposure",   f"{results['risk_score']}/10",
         C["section_loc"],  C["section_rsk"],
         y,
     )
@@ -390,7 +513,7 @@ def generate_property_report(
     pdf.saveState()
     pdf.setFont("Normal", 10)
     pdf.setFillColor(C["section_rsk"])
-    pdf.drawCentredString(MARGIN + CONTENT_W // 2 + 8 + 90, y - 12, risk_label)
+    pdf.drawCentredString(MARGIN + CONTENT_W // 2 + 8 + 90, y - 12, results['risk_label'])
     pdf.restoreState()
     y -= 24
 
@@ -401,7 +524,7 @@ def generate_property_report(
 
     card_top = y + 6
     y -= 8
-    for r in reasons:
+    for r in results['risk_reasons']:
         y = bullet_item(pdf, r, y, C["section_rsk"])
         y -= 4
     draw_card_bg(pdf, card_top, y, C["section_rsk"])
@@ -413,7 +536,7 @@ def generate_property_report(
 
     card_top = y + 6
     y -= 8
-    for insight in insights:
+    for insight in results['insight']:
         y = bullet_item(pdf, insight, y, C["section_ins"])
         y -= 4
     draw_card_bg(pdf, card_top, y, C["section_ins"])
@@ -425,3 +548,4 @@ def generate_property_report(
 
     pdf.save()
     return file_path
+

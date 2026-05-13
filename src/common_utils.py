@@ -42,21 +42,20 @@ def clear_console():
 
 
 #! ---------- TYPING EFFECT ----------
-TYPING_SPEED = 0.1 # seconds per character
 
-def type_text(text, writer=None):
-    NO_CONSOLE = getattr(sys, 'frozen', False)
-    if NO_CONSOLE:
-        print(text)
-    
 
+def type_text(text, typing_speed=0.1, writer=None):
     if writer is None:
-            writer = sys.stdout
-
-    if writer is None:
-        print(text)
-        return
+        writer = sys.stdout
 
     for char in text:
         writer.write(char)
         writer.flush()
+        time.sleep(typing_speed)
+
+
+
+
+
+
+
