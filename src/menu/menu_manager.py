@@ -1,7 +1,8 @@
 
 import utils.common_utils as utils
 import agreement.agreement_manager  as agreement_mod 
-from reports.report_manager import generate_property_report,show_terminal_report 
+from reports.pdf_report import generate_property_report
+from reports.terminal_report import  show_terminal_report
 from data.data_sources import select_data_source
 from core.property_analyzer import analyze_property
 
@@ -66,7 +67,7 @@ def main():
         return
 
     while True:
-        input("")
+        input("\nPress Enter to continue...")
         utils.clear_console()
         print("\n--- Property Investment Calculator ---\n")
         print("1. New Calculation")

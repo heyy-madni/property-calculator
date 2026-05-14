@@ -1,131 +1,5 @@
 # imports
 
-
-
-import utils.common_utils as utils#type:ignore
-
-
-
-
-#& Terminal Report Generator
-def decision_color(decision):
-    return utils.GREEN if decision == "buy" else utils.RED if decision == "sell" else utils.YELLOW
-
-
-def print_header(title):
-    print(utils.RED + "\n" + "=" * 60)
-    print(f"{utils.WHITE}{utils.BOLD}{title.center(60)}{utils.RESET}")
-    print(utils.RED + "=" * 60 + utils.RESET)
-
-
-def print_section(title):
-    print(f"\n{utils.PINK}{utils.BOLD}{title}{utils.RESET}")
-    print(utils.RED + "-" * 60 + utils.RESET)
-
-
-def print_table(title, headers, rows, col_width=24):
-    print(f"\n{utils.PINK}{utils.BOLD}{title}{utils.RESET}")
-    print(utils.RED + "-" * (col_width * len(headers)) + utils.RESET)
-
-    header_row = ""
-    for h in headers:
-        header_row += f"{utils.BOLD}{h:<{col_width}}{utils.RESET}"
-    print(header_row)
-
-    print(utils.RED + "-" * (col_width * len(headers)) + utils.RESET)
-
-    for row in rows:
-        row_str = ""
-        for cell in row:
-            row_str += f"{utils.CYAN}{str(cell):<{col_width}}{utils.RESET}"
-        print(row_str)
-
-    print(utils.RED + "-" * (col_width * len(headers)) + utils.RESET)
-
-
-def print_bar(label, value, max_value=10, color=utils.GREEN):
-    bars = int(min(value, max_value))
-    print(f"{label:<25}: {color}{'█' * bars}{utils.RESET} ({value})")
-
-
-
-#& Summary Report
-
-
-def show_terminal_report(results):
-    utils.clear_console()
-    print_header("PROPERTY ANALYSIS REPORT")
-
-    #& Decision Block
-    d_color = decision_color(results['decision'])
-    s_color = utils.GREEN if results['score'] >= 8 else utils.RED if results['score'] <= 3 else utils.YELLOW
-
-    print(f"\nDecision        : {d_color}{results['decision'].upper()}{utils.RESET}")
-    print(f"Investment Score: {s_color}{results['score']}/10{utils.RESET}")
-    print(f"Deal Type       : {utils.LIGHT_GREEN}{results['deal_type']}{utils.RESET}")
-
-    #& Financial Metrics Table
-    print_table(
-        "Financial Metrics",
-        ["Metric", "Value"],
-        [
-            ("Property Price", f"₹{results['price']:,.0f}"),
-            ("Monthly Cashflow", f"₹{results['cashflow']:,.0f}"),
-            ("Annual Cashflow", f"₹{results['annual_cashflow']:,.0f}"),
-            ("Net Annual (After Tax)", f"₹{results['net_annual_cashflow']:,.0f}"),
-            ("Effective Rent", f"₹{results['effective_rent']:,.0f}"),
-            ("Real ROI", f"{results['real_roi']:.2f}%"),
-            ("Rental Yield", f"{results['rental_yield']:.2f}%"),
-            ("Loan-to-Value (LTV)", f"{results['ltv']:.1f}%"),
-        ]
-    )
-
-    print_bar("ROI Strength", results['real_roi'])
-
-    #& 5-Year Projections
-    print_table(
-        "5-Year Projections",
-        ["Projection", "Estimated Value"],
-        [
-            ("Property Value", f"₹{results['future_value']:,.0f}"),
-            ("Monthly Rent", f"₹{results['future_rent']:,.0f}")
-        ]
-    )
-
-    #& Location & Risk Overview
-    print_table(
-        "Location & Risk Overview",
-        ["Factor", "Score", "Comment"],
-        [
-            ("Location", f"{results['location_score']}/10", "Demand & connectivity"),
-            ("Risk", f"{results['risk_score']}/10", results['risk_label']),
-        ]
-    )
-
-    print_bar("Location Strength", results['location_score'])
-    print_bar("Risk Exposure", results['risk_score'], color=utils.YELLOW)
-
-
-
-    #& Risk Factors
-    print_section("Major Risk Factors")
-    for r in results['risk_reasons']:
-        print(f"{utils.LIGHT_CYAN}- {r}{utils.RESET}")
-
-    #& Insights
-    print_section("Key Insights")
-    for line in results['insight']:
-        print(f"{utils.LIGHT_CYAN}- {line}{utils.RESET}")
-
-
-
-    print(utils.RED + "\n" + "=" * 20)
-    print(utils.LIGHT_YELLOW + "End of Report" + utils.RESET)
-    print(utils.RED + "=" * 20)
-    input(f"\n{utils.LIGHT_YELLOW}Press Enter to return to main menu...{utils.RESET}")
-
-
-
 #!  PDF Report Generator
 
 from reportlab.pdfgen import canvas
@@ -288,26 +162,30 @@ def metric_row(pdf, label, value, y, value_color=None):
 
 #* card wrapper
 
-def open_card(pdf, y, accent=None):
-    """Call before drawing rows. Returns inner_y (top of content area)."""
-    # We don't know card height yet; draw background after close_card.
-    # Instead, use a simple top padding.
-    if accent:
-        left_bar(pdf, MARGIN, y, 4, accent)  # tiny top bar, will extend in close
-    return y - 6
+def measure_metric_rows(rows):
+    """Return total height a list of (label, value) metric rows will occupy."""
+    return len(rows) * 24 + 12   # 24px per row + top/bottom padding
 
 
-def draw_card_bg(pdf, y_top, y_bottom, accent=None):
+def measure_bullet_items(items, max_width=CONTENT_W - 36, line_h=17):
+    """Return total height a list of bullet strings will occupy."""
+    total = 0
+    for text in items:
+        lines = simpleSplit(text, "Normal", 11, max_width)
+        total += len(lines) * line_h + 6 + 4   # item height + gap between items
+    return total + 12
+
+
+def draw_card(pdf, y, height, accent=None):
     """
-    Draw the card background retroactively.
-    y_top: y value BEFORE open_card padding
-    y_bottom: y value after last row
+    Draw card background FIRST (correct z-order), then return inner y
+    for content to be drawn on top.
     """
-    h = y_top - y_bottom + 10
-    rounded_rect(pdf, MARGIN, y_top + 4, CONTENT_W, h,
+    rounded_rect(pdf, MARGIN, y, CONTENT_W, height,
                  r=6, fill=C["white"], stroke=C["border"], line_w=0.6)
     if accent:
-        left_bar(pdf, MARGIN, y_top + 4, h, accent, w=4)
+        left_bar(pdf, MARGIN, y, height, accent, w=4)
+    return y - 6   # inner top, with padding
 
 
 #* bullet item 
@@ -382,21 +260,25 @@ def draw_header(pdf, decision, score, deal_type):
 
     
     pill_x = MARGIN + 70
-    rounded_rect(pdf, pill_x, badge_y, 110, 30, r=15, fill=dbc)
+    # dynamic width: measure actual text, add 48px padding, min 110
+    pill_text_w = pdf.stringWidth(d, "Bold", 14)
+    pill_w = max(110, int(pill_text_w) + 48)
+    rounded_rect(pdf, pill_x, badge_y, pill_w, 30, r=15, fill=dbc)
     pdf.saveState()
     pdf.setFont("Bold", 14)
     pdf.setFillColor(dc)
-    pdf.drawCentredString(pill_x + 55, badge_y - 20, d)
+    pdf.drawCentredString(pill_x + pill_w // 2, badge_y - 20, d)
     pdf.restoreState()
 
-    
-    tag_x = pill_x + 120
-    rounded_rect(pdf, tag_x, badge_y, 180, 30, r=6, fill=C["teal_light"])
-    pdf.saveState()
-    pdf.setFont("Normal", 10)
-    pdf.setFillColor(C["teal"])
-    pdf.drawCentredString(tag_x + 90, badge_y - 20, deal_type)
-    pdf.restoreState()
+    tag_x = pill_x + pill_w + 10   # 10px gap, wherever pill ends
+    tag_w = min(180, MARGIN + CONTENT_W - tag_x)
+    if tag_w > 40:
+        rounded_rect(pdf, tag_x, badge_y, tag_w, 30, r=6, fill=C["teal_light"])
+        pdf.saveState()
+        pdf.setFont("Normal", 10)
+        pdf.setFillColor(C["teal"])
+        pdf.drawCentredString(tag_x + tag_w // 2, badge_y - 20, deal_type)
+        pdf.restoreState()
 
     return badge_y - 48    # y ready for first section
 
@@ -465,8 +347,6 @@ def generate_property_report(results):
     # ── FINANCIAL METRICS ────────────────────────────────────────────
     y = section_header(pdf, "Financial Metrics", C["section_fin"], y)
 
-    card_top = y
-    y = open_card(pdf, y)
     metrics = [
         ("Property Price",         f"₹{results['price']:,.0f}"),
         ("Monthly Cashflow",       f"₹{results['cashflow']:,.0f}"),
@@ -476,24 +356,26 @@ def generate_property_report(results):
         ("Rental Yield",           f"{results['rental_yield']:.2f}%"),
         ("Loan-to-Value (LTV)",    f"{results['ltv']:.1f}%"),
     ]
+    card_h = measure_metric_rows(metrics)
+    y = check_y(pdf, y, card_h)
+    y = draw_card(pdf, y, card_h, C["section_fin"])
     for label, value in metrics:
         y = metric_row(pdf, label, value, y, C["section_fin"])
-    draw_card_bg(pdf, card_top, y, C["section_fin"])
     y -= 18
 
 
     # ── 5-YEAR PROJECTIONS ───────────────────────────────────────────
     y = section_header(pdf, "5-Year Projections", C["section_prj"], y)
 
-    card_top = y
-    y = open_card(pdf, y)
     projections = [
         ("Estimated Property Value", f"₹{results['future_value']:,.0f}"),
         ("Estimated Monthly Rent",   f"₹{results['future_rent']:,.0f}"),
     ]
+    card_h = measure_metric_rows(projections)
+    y = check_y(pdf, y, card_h)
+    y = draw_card(pdf, y, card_h, C["section_prj"])
     for label, value in projections:
         y = metric_row(pdf, label, value, y, C["section_prj"])
-    draw_card_bg(pdf, card_top, y, C["section_prj"])
     y -= 18
 
 
@@ -522,24 +404,24 @@ def generate_property_report(results):
     y -= 8
     y = section_header(pdf, "Major Risk Factors", C["section_rsk"], y)
 
-    card_top = y + 6
-    y -= 8
+    card_h = measure_bullet_items(results['risk_reasons'])
+    y = check_y(pdf, y, card_h)
+    y = draw_card(pdf, y, card_h, C["section_rsk"])
     for r in results['risk_reasons']:
         y = bullet_item(pdf, r, y, C["section_rsk"])
         y -= 4
-    draw_card_bg(pdf, card_top, y, C["section_rsk"])
     y -= 18
 
 
     # ── KEY INSIGHTS ─────────────────────────────────────────────────
     y = section_header(pdf, "Key Insights", C["section_ins"], y)
 
-    card_top = y + 6
-    y -= 8
+    card_h = measure_bullet_items(results['insight'])
+    y = check_y(pdf, y, card_h)
+    y = draw_card(pdf, y, card_h, C["section_ins"])
     for insight in results['insight']:
         y = bullet_item(pdf, insight, y, C["section_ins"])
         y -= 4
-    draw_card_bg(pdf, card_top, y, C["section_ins"])
     y -= 24
 
 
