@@ -79,7 +79,7 @@ def get_growth_data():
 
     appreciation = get_float(utils.PINK + "Expected appreciation: ")
     rent_growth = get_float(utils.PINK + "Expected rent growth: ")
-    vacancy_rate = get_float(utils.PINK + "Vacancy rate: ")
+    vacancy_rate = get_float(utils.PINK +"Vacancy rate (decimal, e.g. 0.10 for 10%): ")
 
     if vacancy_rate < 0 or vacancy_rate >= 100: #type: ignore
         print(utils.RED + "Invalid vacancy rate.")

@@ -1,10 +1,10 @@
 
-import utils.common_utils as utils
-import agreement.agreement_manager  as agreement_mod 
-from reports.pdf_report import generate_property_report
-from reports.terminal_report import  show_terminal_report
-from data.data_sources import select_data_source
-from core.property_analyzer import analyze_property
+import utils.common_utils as utils # type: ignore
+import agreement.agreement_manager  as agreement_mod  # type: ignore
+from reports.pdf_report import generate_property_report # type: ignore
+from reports.terminal_report import  show_terminal_report # type: ignore
+from data.data_sources import select_data_source # type: ignore
+from core.property_analyzer import analyze_property # type: ignore
 
 
 
@@ -83,7 +83,7 @@ def main():
             break
 
         if choice == "2":
-            from reports.pdf_report_library import view_previous_pdfs
+            from reports.pdf_report_library import view_previous_pdfs # type: ignore
             view_previous_pdfs()
             continue
 

@@ -63,13 +63,14 @@ def calculate_score_rent_to_emi(rent_to_emi_coverage):
     score = 0
     if rent_to_emi_coverage >= 100:
         score += 2
-    elif rent_to_emi_coverage <= 90:
+    elif rent_to_emi_coverage >= 90:
         score += 1
-    elif rent_to_emi_coverage < 70:
+    elif rent_to_emi_coverage >= 70:
         score -= 1
-    elif rent_to_emi_coverage < 60:
+    else:
         score -= 2
     return score
+
 #& this is decision that use score
 def make_decision(score):
     if score >= 8:
@@ -90,8 +91,7 @@ def calculate_score(
     cashflow,
     rent_to_emi_coverage,
     ltv,
-    location_score
-):
+    location_score):
     score = 0
     score += calculate_score_real_roi(real_roi)
     score += calculate_score_cashflow(cashflow)
