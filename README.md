@@ -1,4 +1,4 @@
-# Property Investment Calculator
+# Property Investment Analyzer
 
 A terminal-based property investment analysis tool built with Python. Enter property details and get a full financial breakdown, risk assessment, deal classification, and a downloadable PDF report — all without needing an internet connection or external APIs.
 
